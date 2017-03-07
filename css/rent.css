@@ -1,0 +1,18 @@
+.card {
+    /*margin: 10px;*/
+}
+
+.rent-card {
+    padding: 0;
+    margin-left: 0;
+    padding-top: 10px;
+    font-size: 14px;
+}
+
+.left-card {
+    padding-right: 5px;
+}
+
+.right-card {
+    padding-left: 5px;
+}

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <script src="https://www.gstatic.com/firebasejs/3.7.0/firebase.js"></script>
+    <script>
+        // Initialize Firebase
+        var config = {
+
+        };
+        firebase.initializeApp(config);
+    </script>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/rent.css">
+    <script src="js/angular.min.js"></script>
+    <script src="js/app.js"></script>
+</head>
+<body  ng-app="RentCalculator">
+<div class="container">
+    <div class="row">
+        <nav class="navbar navbar-toggleable-md navbar-inverse bg-inverse col-lg-12">
+            <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <a class="navbar-brand" href="#">Rent Calculator</a>
+        </nav>
+    </div>
+</div>
+<div class="container" ng-controller="TarrifItemsController">
+    <div class="row" >
+        <div class="col rent-card left-card">
+            <div class="card">
+                <div class="card-header">
+                    Оплата
+                </div>
+                <div>
+                    <div class="card-block">
+                            <div class="form-group" ng-repeat="tarrif in tarrifs">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <h4>{{ tarrif.name }}</h4>
+                                    </div>
+                                    <div class="col-3 card-input">
+                                        <label for="current-value" class="col-form-label" ng-if="!tarrif.isStatic">Тек. пок</label>
+                                        <input class="form-control" type="text" ng-model="tarrif.new_counter" id="current-value"
+                                               ng-if="!tarrif.isStatic" ng-change="calculatePrice(tarrif)" >
+                                    </div>
+                                    <div class="col-3 card-input">
+                                        <label for="last-value" class="col-form-label" ng-if="!tarrif.isStatic">Прош. Пок.</label>
+                                        <input class="form-control" type="text" ng-model="tarrif.counter" id="last-value" ng-if="!tarrif.isStatic" disabled>
+                                    </div>
+                                    <div class="col-3 card-input">
+                                        <label for="current-price" class="col-form-label" ng-if="!tarrif.isStatic">Тариф</label>
+                                        <input class="form-control" type="text" ng-model="tarrif.price" id="current-price" disabled ng-if="!tarrif.isStatic">
+                                    </div>
+                                    <div class="col-3 card-input ">
+                                        <label for="calculated-price" class="col-form-label">Цена</label>
+                                        <input class="form-control" type="text" ng-model="tarrif.calculatedPrice" id="calculated-price" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 text-right">
+                                    Сумма: {{ getSum() }} грн
+                                </div>
+                            </div>
+                        <a href="#" class="btn btn-primary">Оплатить</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="rent-card right-card">
+                <div class="card">
+                    <div class="card-header">
+                        Тарифы
+                    </div>
+                    <div class="card-block">
+                        <div class="row">
+                            <div class="col-4">
+                                Тариф
+                            </div>
+                            <div class="col-4">
+                                Цена
+                            </div>
+                            <div class="col-4">
+                                Прош. показания
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-repeat="tarrif in tarrifs">
+                            <div class="col-4 card-input">
+                                <label for="last-value" class="col-form-label">{{ tarrif.name }}</label>
+                            </div>
+                            <div class="col-4 card-input">
+                                <input class="form-control" type="text"  ng-change="toggleStatic(tarrif)"  ng-model="tarrif.price" id="price-{{ tarrif.id }}">
+                            </div>
+                            <div class="col-4 card-input">
+                                <input class="form-control" type="text" ng-model="tarrif.counter" id="last-value-{{ tarrif.id }}" ng-if="!tarrif.isStatic">
+                            </div>
+                        </div>
+                        <a href="#" class="btn btn-primary" ng-click="getPromiseTarrifs()">Обновить</a>
+                    </div>
+                </div>
+            </div>
+            <div class="rent-card right-card">
+                <div class="card">
+                    <div class="card-header">
+                        Добавить тариф
+                    </div>
+                    <div class="card-block">
+                        <h4>Тарифы</h4>
+                        <div class="form-group" ng-repeat="tarrif in getTarrifs()">
+                            <div class="row">
+                                <div class="col-8 card-input">
+                                    <input class="form-control" type="text" ng-model="tarrif.name" id="current-value-{{ tarrif.id }}">
+                                </div>
+                                <div class="col-4 card-input">
+                                    <input class="form-control" type="checkbox" ng-click="toggleStatic(tarrif)" ng-model="tarrif.isStatic" id="is-static-{{ tarrif.id }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-8 card-input">
+                                <input class="form-control" type="text" ng-model="new_value" value="">
+                            </div>
+                        </div>
+                        <a href="#" class="btn btn-primary" ng-click="add()">Добавить</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col rent-card left-card">
+            <div class="card">
+                <div class="card-header">
+                    История оплаты
+                </div>
+                <div class="card-block">
+                    <h4 class="card-title">Special title treatment</h4>
+                    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                    <a href="#" class="btn btn-primary">Go somewhere</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="col">
+            <hr>
+            <footer class="footer">
+                <p>© Rent Calculator 2017</p>
+            </footer>
+        </div>
+    </div>
+</div>
+
+
+<!-- jQuery first, then Tether, then Bootstrap JS. -->
+<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+</body>
+</html>

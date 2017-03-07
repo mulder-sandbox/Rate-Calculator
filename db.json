@@ -1,0 +1,51 @@
+{"tarrifs": [
+  {
+    "id": 1,
+    "name": "Гарячая вода",
+    "price": 83.1,
+    "counter": 150
+  },
+  {
+    "id": 2,
+    "name": "Холодная вода",
+    "counter": 141,
+    "price": 15.06
+  },
+  {
+    "id": 3,
+    "name": "Свет",
+    "price": 0.59,
+    "counter": 16843
+  },
+  {
+    "id": 4,
+    "name": "Аренда",
+    "price": 5500,
+    "isStatic": true
+  },
+  {
+    "id": 4,
+    "name": "Газ",
+    "price": 45.2,
+    "isStatic": true
+  },
+  {
+    "id": 4,
+    "name": "Ком. услуги",
+    "price": 114,
+    "isStatic": true
+  },
+  {
+    "id": 4,
+    "name": "Отопление",
+    "price": 764,
+    "isStatic": true
+  },
+  {
+    "id": 4,
+    "name": "Долг",
+    "price": 764,
+    "isStatic": true
+  }
+]
+}
