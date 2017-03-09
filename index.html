@@ -26,11 +26,11 @@
             <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <a class="navbar-brand" href="#">Rent Calculator</a>
+            <a class="navbar-brand" href="">Rent Calculator</a>
         </nav>
     </div>
 </div>
-<div class="container" ng-controller="TarrifItemsController">
+<div class="container" ng-controller="TarrifItemsController" ng-init="getPromiseTarrifs()">
     <div class="row" >
         <div class="col rent-card left-card">
             <div class="card">
@@ -39,7 +39,7 @@
                 </div>
                 <div>
                     <div class="card-block">
-                            <div class="form-group" ng-repeat="tarrif in tarrifs">
+                            <div class="form-group" ng-repeat="tarrif in tarrifs  track by $index">
                                 <div class="row">
                                     <div class="col-12">
                                         <h4>{{ tarrif.name }}</h4>
@@ -57,7 +57,7 @@
                                         <label for="current-price" class="col-form-label" ng-if="!tarrif.isStatic">Тариф</label>
                                         <input class="form-control" type="text" ng-model="tarrif.price" id="current-price" disabled ng-if="!tarrif.isStatic">
                                     </div>
-                                    <div class="col-3 card-input ">
+                                    <div class="col-3 card-input">
                                         <label for="calculated-price" class="col-form-label">Цена</label>
                                         <input class="form-control" type="text" ng-model="tarrif.calculatedPrice" id="calculated-price" disabled>
                                     </div>
@@ -68,7 +68,19 @@
                                     Сумма: {{ getSum() }} грн
                                 </div>
                             </div>
-                        <a href="#" class="btn btn-primary">Оплатить</a>
+                        <div class="row">
+                            <div class="col-12t">
+                                <div class="card-input">
+                                    <label for="calculated-price" class="col-form-label">Комментарий</label>
+                                    <input class="form-control" type="text" ng-model="comment">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 text-right">
+                                <a href="" ng-click="pay()" class="btn btn-primary">Оплатить</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -91,18 +103,38 @@
                                 Прош. показания
                             </div>
                         </div>
-                        <div class="form-group row" ng-repeat="tarrif in tarrifs">
-                            <div class="col-4 card-input">
+                        <div class="form-group row" ng-repeat="tarrif in tarrifs  track by $index">
+                            <div class="col-3 card-input">
                                 <label for="last-value" class="col-form-label">{{ tarrif.name }}</label>
                             </div>
-                            <div class="col-4 card-input">
-                                <input class="form-control" type="text"  ng-change="toggleStatic(tarrif)"  ng-model="tarrif.price" id="price-{{ tarrif.id }}">
+                            <div class="col-6 card-input">
+                                <input class="form-control" type="text" ng-change="toggleStatic(tarrif)"  ng-model="tarrif.price" id="price-{{ tarrif.id }}" ng-hide="tarrif.isTable">
+                                <div  class="form-group" ng-repeat="tableRate in tarrif.tableRate  track by $index">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <input class="form-control input-inline" type="text" ng-model="tableRate.val" ng-show="tarrif.isTable">
+                                        </div>
+                                        <div class="col-6">
+                                            <input class="form-control input-inline" type="text" ng-model="tableRate.price" ng-show="tarrif.isTable">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-4">
+                                        <input class="form-control" type="text" ng-model="tarrif.table.val" ng-show="tarrif.isTable">
+                                    </div>
+                                    <div class="col-4">
+                                        <input class="form-control" type="text" ng-model="tarrif.table.price" ng-show="tarrif.isTable">
+                                    </div>
+                                    <div class="col-4">
+                                        <a href=""  class="form-control btn-success" ng-show="tarrif.isTable" class="btn btn-primary" ng-click="addTableRate(tarrif)">add</a>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-4 card-input">
+                            <div class="col-3 card-input">
                                 <input class="form-control" type="text" ng-model="tarrif.counter" id="last-value-{{ tarrif.id }}" ng-if="!tarrif.isStatic">
                             </div>
                         </div>
-                        <a href="#" class="btn btn-primary" ng-click="getPromiseTarrifs()">Обновить</a>
                     </div>
                 </div>
             </div>
@@ -113,13 +145,30 @@
                     </div>
                     <div class="card-block">
                         <h4>Тарифы</h4>
-                        <div class="form-group" ng-repeat="tarrif in getTarrifs()">
+                        <div class="row">
+                            <div class="col-8">
+                                Тариф
+                            </div>
+                            <div class="col-1">
+                                Без счет.
+                            </div>
+                            <div class="col-1">
+                                Табличный
+                            </div>
+                        </div>
+                        <div class="form-group" ng-repeat="tarrif in getTarrifs()  track by $index">
                             <div class="row">
                                 <div class="col-8 card-input">
                                     <input class="form-control" type="text" ng-model="tarrif.name" id="current-value-{{ tarrif.id }}">
                                 </div>
-                                <div class="col-4 card-input">
+                                <div class="col-1 card-input">
                                     <input class="form-control" type="checkbox" ng-click="toggleStatic(tarrif)" ng-model="tarrif.isStatic" id="is-static-{{ tarrif.id }}">
+                                </div>
+                                <div class="col-1 card-input">
+                                    <input class="form-control" type="checkbox" ng-model="tarrif.isTable" id="is-table-{{ tarrif.id }}">
+                                </div>
+                                <div class="col-1 card-input">
+                                    <a href="" class="btn btn-danger" ng-click="geleteTarrif($index)">X</a>
                                 </div>
                             </div>
                         </div>
@@ -127,8 +176,14 @@
                             <div class="col-8 card-input">
                                 <input class="form-control" type="text" ng-model="new_value" value="">
                             </div>
+                            <div class="col-1 card-input">
+                                <input class="form-control" type="checkbox" ng-model="isStatic">
+                            </div>
+                            <div class="col-1 card-input">
+                                <input class="form-control" type="checkbox" ng-model="isTable">
+                            </div>
                         </div>
-                        <a href="#" class="btn btn-primary" ng-click="add()">Добавить</a>
+                        <a href="" class="btn btn-primary" ng-click="add()">Добавить</a>
                     </div>
                 </div>
             </div>
@@ -141,9 +196,19 @@
                     История оплаты
                 </div>
                 <div class="card-block">
-                    <h4 class="card-title">Special title treatment</h4>
-                    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                    <a href="#" class="btn btn-primary">Go somewhere</a>
+                    <div  ng-repeat="pay in getPayHistory() track by $index">
+                        ---------- {{pay.payDate | date:'yyyy-MM-dd'}} ---------
+                        <ul>
+                            <li ng-repeat="tarrif in pay.tarrifs  track by $index">
+                                <p>
+                                    <b>{{ tarrif.name}}</b> {{ tarrif.new_counter }} {{ tarrif.isStatic ? '' : 'x' }} {{ tarrif.price }} = {{ tarrif.calculatedPrice }} грн
+                                </p>
+                            </li>
+                        </ul>
+
+                        ----------- Сумма:  {{ pay.total }} грн -----------  {{ pay.comment }}
+                        <a href="" ng-click="deletePay($index)">[Удалить]</a>
+                    </div>
                 </div>
             </div>
         </div>
